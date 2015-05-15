@@ -1,20 +1,45 @@
 package weidongjian.example.com.instademo;
 
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import weidongjian.example.com.instademo.adapter.FeedAdapter;
 
-public class MainActivity extends AppCompatActivity {
+
+public class MainActivity extends BaseActivity {
+    private Toolbar toolbar;
+    private static final int ANIM_DURATION_TOOLBAR = 300;
+    private static final int ANIM_DURATION_FAB = 400;
+    private RecyclerView rvFeed;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
 
-        Log.d("debug", "MainActivity onCreate");
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        toolbar.setNavigationIcon(R.drawable.ic_menu_white);
+
+        init();
+    }
+
+    private void init() {
+        rvFeed = (RecyclerView) findViewById(R.id.rvFeed);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this){
+            @Override
+            protected int getExtraLayoutSpace(RecyclerView.State state) {
+                return 300;
+            }
+        };
+        rvFeed.setLayoutManager(linearLayoutManager);
+        FeedAdapter adapter = new FeedAdapter(this);
+        rvFeed.setAdapter(adapter);
     }
 
     @Override
