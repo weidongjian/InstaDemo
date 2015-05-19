@@ -2,7 +2,6 @@ package weidongjian.example.com.instademo;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
-import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.os.Bundle;
@@ -10,17 +9,16 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.OvershootInterpolator;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 
 import weidongjian.example.com.instademo.adapter.FeedAdapter;
+import weidongjian.example.com.instademo.view.FeedContextMenuManager;
 
 
 public class MainActivity extends BaseActivity {
@@ -65,6 +63,12 @@ public class MainActivity extends BaseActivity {
             }
         });
         ivLogo = (ImageView) findViewById(R.id.ivLogo);
+        rvFeed.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                FeedContextMenuManager.getInstance().onScrolled(recyclerView, dx, dy);
+            }
+        });
         adapter.setOnFeedItemClickListener(new FeedAdapter.OnFeedItemClickListener() {
             @Override
             public void onCommentClick(View view, int position) {
@@ -87,32 +91,11 @@ public class MainActivity extends BaseActivity {
             public void onMoreClick(View view, int position) {
                 int[] positions = new int[2];
                 view.getLocationOnScreen(positions);
-                popupView = LayoutInflater.from(context).inflate(R.layout.popup, null);
-//                PopupWindow popupWindow = new PopupWindow(popupView, RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-//                popupWindow.showAtLocation(view, Gravity.TOP | Gravity.LEFT, positions[0], positions[1]);
-//                popupWindow.setBackgroundDrawable(new ColorDrawable(0));
-//                animPopupWindow(popupWindow.getContentView());
-                ((ViewGroup)view.getRootView().findViewById(android.R.id.content)).addView(popupView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                popupView.setTranslationX(positions[0]);
-                popupView.setTranslationY(positions[1] - utils.dpToPx(100));
-                animPopupWindow(popupView);
+                FeedContextMenuManager.getInstance().toggleContextMenuView(view);
             }
         });
     }
 
-    private void animPopupWindow(View view) {
-        popupView.setScaleX(0.1f);
-        popupView.setScaleY(0.1f);
-        ObjectAnimator animator1 = ObjectAnimator.ofFloat(view, "scaleX", 1f);
-        animator1.setInterpolator(new OvershootInterpolator());
-        ObjectAnimator animator2 = ObjectAnimator.ofFloat(popupView, "scaleY", 1f);
-        animator2.setInterpolator(new OvershootInterpolator());
-        AnimatorSet animatorSet = new AnimatorSet();
-        animatorSet.setDuration(ANIM_DURATION_FAB);
-//        animatorSet.setInterpolator(new OvershootInterpolator());
-        animatorSet.playTogether(animator1, animator2);
-        animatorSet.start();
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
